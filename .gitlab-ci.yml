@@ -12,6 +12,7 @@ test:node-20:
   image: node:20
   script:
     - npm ci
+    - mkdir -p test/output
     - npm test
 
 test:node-22:
@@ -19,4 +20,5 @@ test:node-22:
   image: node:22
   script:
     - npm ci
+    - mkdir -p test/output
     - npm test
