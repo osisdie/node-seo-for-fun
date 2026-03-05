@@ -1,20 +1,49 @@
 {
-  "name": "web_nj_seo",
-  "version": "0.0.1",
-  "private": true,
+  "name": "node-seo-for-fun",
+  "version": "0.1.0",
+  "description": "Node.js application to parse HTML DOM, validate SEO scores, and provide alerting messages for recommendations",
+  "main": "app.js",
   "scripts": {
-    "test": "mocha --timeout 15000"
+    "test": "mocha --timeout 15000",
+    "lint": "eslint .",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "seo",
+    "html",
+    "validator",
+    "cheerio",
+    "dom"
+  ],
+  "author": "osisdie",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osisdie/node-seo-for-fun.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   },
   "dependencies": {
-    "assert": "^1.5.1",
     "cheerio": "^1.1.2",
     "debug": "^4.4.3",
     "express": "^4.22.1",
-    "fs": "0.0.2",
+    "nconf": "~0.13.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.2",
     "mocha": "^11.7.5",
-    "nconf": "~0.13.0",
     "nodemon": "^3.1.11",
-    "should": "^13.2.3",
-    "stream": "0.0.3"
+    "should": "^13.2.3"
+  },
+  "lint-staged": {
+    "*.js": "eslint"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.3",
+    "diff": "^8.0.3"
   }
 }
