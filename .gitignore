@@ -1,5 +1,17 @@
 # temp
+.out
+**/*.out
 output/
+test/output/
+
+# Claude Code
+.claude/settings.local.json
+
+# Firebase
+firebase-debug.log
+
+# Playwright MCP
+.playwright-mcp/
 
 # Logs
 logs

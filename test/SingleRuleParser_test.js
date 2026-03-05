@@ -33,7 +33,7 @@ describe('SingleRuleParser() requires(/lib/seo/seo_validator.js)', function () {
       ]
 
       tests.forEach(function (test) {
-        describe(test.rule, function () {
+        describe(`rule-${test.rule}`, function () {
           describe(`seo:rules:rule${test.rule}:ruleFor should have ${test.expected} element(s)`, function () {
             let list = AppUtil.getCfgVal(`seo:rules:rule${test.rule}:ruleFor`)
             assert.ok(list)
@@ -55,7 +55,7 @@ describe('SingleRuleParser() requires(/lib/seo/seo_validator.js)', function () {
       ]
 
       tests.forEach(function (test) {
-        describe(test.rule, function () {
+        describe(`rule-${test.rule}`, function () {
           describe(`seo:rules:rule${test.rule}:ruleFor should have ${test.expected} element(s)`, function () {
             let list = AppUtil.getCfgVal(`seo:rules:rule${test.rule}:ruleFor`)
             assert.ok(list)

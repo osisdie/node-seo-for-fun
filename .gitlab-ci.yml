@@ -1,0 +1,24 @@
+stages:
+  - test
+
+default:
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+
+test:node-20:
+  stage: test
+  image: node:20
+  script:
+    - npm ci
+    - mkdir -p test/output
+    - npm test
+
+test:node-22:
+  stage: test
+  image: node:22
+  script:
+    - npm ci
+    - mkdir -p test/output
+    - npm test
