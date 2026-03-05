@@ -7,13 +7,6 @@ default:
     paths:
       - node_modules/
 
-test:node-18:
-  stage: test
-  image: node:18
-  script:
-    - npm ci
-    - npm test
-
 test:node-20:
   stage: test
   image: node:20

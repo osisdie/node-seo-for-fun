@@ -6,7 +6,7 @@ Node.js application to parse HTML DOM document, validate its SEO scores, and sho
 
 ## Prerequisites
 
-- Node.js 14.0 or higher
+- Node.js 20.0 or higher
 
 ## Installation
 
