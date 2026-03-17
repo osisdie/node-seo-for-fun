@@ -19,7 +19,7 @@ A configurable Node.js SEO validator that parses HTML DOM, checks against custom
 - **Web UI included** — paste HTML and get instant results via browser
 - **Vercel-ready** — one-click deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fosisdie%2Fnode-seo-for-fun)
+**[Live Demo](https://node-seo-for-fun.vercel.app)** | [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fosisdie%2Fnode-seo-for-fun)
 
 ## Quick Example
 
