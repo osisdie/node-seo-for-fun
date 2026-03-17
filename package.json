@@ -1,9 +1,11 @@
 {
   "name": "node-seo-for-fun",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Node.js application to parse HTML DOM, validate SEO scores, and provide alerting messages for recommendations",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "mocha --timeout 15000",
     "lint": "eslint .",
     "prepare": "husky"

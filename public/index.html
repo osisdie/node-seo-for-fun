@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free online SEO validator - paste HTML and get instant SEO recommendations">
+  <meta name="keywords" content="seo, validator, html, checker, node.js">
+  <title>Node SEO Validator - Check Your HTML for SEO Issues</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle { color: #94a3b8; margin-bottom: 2rem; }
+    .subtitle a { color: #38bdf8; text-decoration: none; }
+    .subtitle a:hover { text-decoration: underline; }
+
+    .panel {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #cbd5e1; }
+    textarea {
+      width: 100%;
+      height: 260px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 1rem;
+      color: #e2e8f0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    textarea:focus { outline: none; border-color: #38bdf8; }
+    textarea::placeholder { color: #475569; }
+
+    .rules-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .rule-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s;
+    }
+    .rule-chip:hover { border-color: #38bdf8; }
+    .rule-chip input { accent-color: #38bdf8; }
+    .rule-chip.checked { border-color: #38bdf8; background: #1e3a5f; }
+
+    .actions { display: flex; gap: 1rem; margin-top: 1.25rem; align-items: center; }
+    button {
+      padding: 0.65rem 1.75rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; }
+    .btn-secondary { background: #334155; color: #e2e8f0; }
+    .btn-link { background: none; color: #94a3b8; padding: 0.65rem 0.5rem; text-decoration: underline; }
+
+    .result-panel { display: none; }
+    .result-panel.visible { display: block; }
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-pass { background: #166534; color: #4ade80; }
+    .badge-warn { background: #713f12; color: #fbbf24; }
+    .warning-list { list-style: none; }
+    .warning-list li {
+      padding: 0.75rem 1rem;
+      background: #0f172a;
+      border-left: 3px solid #f59e0b;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .pass-msg {
+      padding: 1.5rem;
+      text-align: center;
+      color: #4ade80;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid #334155;
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    footer {
+      text-align: center;
+      color: #475569;
+      font-size: 0.8rem;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1e293b;
+    }
+    footer a { color: #38bdf8; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Node SEO Validator</h1>
+    <p class="subtitle">Paste HTML below to check for SEO issues &middot; <a href="https://github.com/osisdie/node-seo-for-fun" target="_blank">GitHub</a></p>
+
+    <div class="panel">
+      <label for="html-input">HTML Input</label>
+      <textarea id="html-input" placeholder="<!DOCTYPE html>
+<html>
+<head>
+  <title>My Page</title>
+</head>
+<body>
+  <h1>Hello World</h1>
+  <img src=&quot;photo.jpg&quot;>
+  <a href=&quot;/link&quot;>Click</a>
+</body>
+</html>"></textarea>
+
+      <div class="rules-row" id="rules-row"></div>
+
+      <div class="actions">
+        <button class="btn-primary" id="btn-validate" onclick="validate()">Validate SEO</button>
+        <button class="btn-secondary" onclick="loadSample()">Load Sample</button>
+        <button class="btn-link" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+
+    <div class="panel result-panel" id="result-panel">
+      <div class="result-header">
+        <label>Results</label>
+        <span class="badge" id="result-badge"></span>
+      </div>
+      <div id="result-body"></div>
+    </div>
+
+    <footer>
+      Built with <a href="https://github.com/osisdie/node-seo-for-fun">node-seo-for-fun</a> &middot; MIT License
+    </footer>
+  </div>
+
+  <script>
+    const RULES = [
+      { id: 1, label: 'img alt', desc: '<img> must have alt attribute', on: true },
+      { id: 2, label: 'a rel', desc: '<a> must have rel attribute', on: true },
+      { id: 3, label: 'head meta', desc: '<head> must have title, description, keywords', on: true },
+      { id: 4, label: 'strong ≤15', desc: 'No more than 15 <strong> tags', on: true },
+      { id: 5, label: 'h1 unique', desc: 'Only one <H1> allowed', on: true },
+      { id: 101, label: 'meta robots', desc: '<meta name="robots"> must exist', on: false }
+    ];
+
+    const rulesRow = document.getElementById('rules-row');
+    RULES.forEach(function(r) {
+      const chip = document.createElement('label');
+      chip.className = 'rule-chip' + (r.on ? ' checked' : '');
+      chip.title = r.desc;
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = r.id;
+      checkbox.checked = r.on;
+      checkbox.addEventListener('change', function() {
+        chip.classList.toggle('checked', this.checked);
+      });
+
+      const text = document.createTextNode(' Rule ' + r.id + ': ' + r.label);
+      chip.appendChild(checkbox);
+      chip.appendChild(text);
+      rulesRow.appendChild(chip);
+    });
+
+    const SAMPLE = '<!DOCTYPE html>\n<html>\n<head>\n  <title>My Awesome Page</title>\n</head>\n<body>\n  <h1>Welcome</h1>\n  <img src="hero.jpg">\n  <img src="logo.png" alt="Logo">\n  <a href="/about">About Us</a>\n  <a href="/contact" rel="noopener">Contact</a>\n  <p>This page has some <strong>bold</strong> text.</p>\n</body>\n</html>';
+
+    function loadSample() {
+      document.getElementById('html-input').value = SAMPLE;
+    }
+
+    function clearAll() {
+      document.getElementById('html-input').value = '';
+      document.getElementById('result-panel').classList.remove('visible');
+    }
+
+    function getSelectedRules() {
+      return Array.from(document.querySelectorAll('#rules-row input:checked')).map(function(el) {
+        return Number(el.value);
+      });
+    }
+
+    function escapeHtml(s) {
+      var d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function renderResults(data) {
+      var panel = document.getElementById('result-panel');
+      var badge = document.getElementById('result-badge');
+      var body = document.getElementById('result-body');
+
+      panel.classList.add('visible');
+
+      // Clear previous results
+      while (body.firstChild) body.removeChild(body.firstChild);
+
+      if (data.count === 0) {
+        badge.className = 'badge badge-pass';
+        badge.textContent = 'ALL PASS';
+        var msg = document.createElement('div');
+        msg.className = 'pass-msg';
+        msg.textContent = 'No SEO issues found!';
+        body.appendChild(msg);
+      } else {
+        badge.className = 'badge badge-warn';
+        badge.textContent = data.count + ' warning' + (data.count > 1 ? 's' : '');
+        var ul = document.createElement('ul');
+        ul.className = 'warning-list';
+        data.warnings.forEach(function(w) {
+          var li = document.createElement('li');
+          li.textContent = w;
+          ul.appendChild(li);
+        });
+        body.appendChild(ul);
+      }
+    }
+
+    function renderError(message) {
+      var panel = document.getElementById('result-panel');
+      var badge = document.getElementById('result-badge');
+      var body = document.getElementById('result-body');
+
+      panel.classList.add('visible');
+      badge.className = 'badge badge-warn';
+      badge.textContent = 'ERROR';
+
+      while (body.firstChild) body.removeChild(body.firstChild);
+      var msg = document.createElement('div');
+      msg.className = 'pass-msg';
+      msg.style.color = '#f87171';
+      msg.textContent = message;
+      body.appendChild(msg);
+    }
+
+    async function validate() {
+      var html = document.getElementById('html-input').value.trim();
+      if (!html) { alert('Please paste some HTML first.'); return; }
+
+      var rules = getSelectedRules();
+      if (!rules.length) { alert('Please select at least one rule.'); return; }
+
+      var btn = document.getElementById('btn-validate');
+      btn.disabled = true;
+      btn.textContent = 'Validating...';
+
+      try {
+        var resp = await fetch('/api/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ html: html, rules: rules })
+        });
+        var data = await resp.json();
+
+        if (!resp.ok) throw new Error(data.error || 'Request failed');
+        renderResults(data);
+      } catch (err) {
+        renderError(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Validate SEO';
+      }
+    }
+  </script>
+</body>
+</html>

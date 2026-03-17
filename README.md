@@ -1,8 +1,63 @@
 # node-seo-for-fun
 
-Node.js application to parse HTML DOM document, validate its SEO scores, and show alerting messages for recommendations.
+[![CI](https://github.com/osisdie/node-seo-for-fun/actions/workflows/ci.yml/badge.svg)](https://github.com/osisdie/node-seo-for-fun/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Last Commit](https://img.shields.io/github/last-commit/osisdie/node-seo-for-fun)](https://github.com/osisdie/node-seo-for-fun/commits/main)
+
+A configurable Node.js SEO validator that parses HTML DOM, checks against customizable rules, and reports actionable recommendations. Supports file and stream I/O with flexible output options.
 
 *Series of code_for_fun*
+
+## Features
+
+- **5 built-in SEO rules** — covers `<img alt>`, `<a rel>`, `<head>` meta tags, `<strong>` overuse, `<H1>` uniqueness
+- **Custom rules** — define your own rules via JSON config (no code changes needed)
+- **Flexible I/O** — read from files or streams, output to files, streams, or console
+- **Pattern-based** — extensible pattern system (`existsTag`, `existsAttr`, `existsNoAttr`, `existsAttrVal`, `tagCountLessThan`)
+- **Selective validation** — include or exclude specific rules per run
+- **Web UI included** — paste HTML and get instant results via browser
+- **Vercel-ready** — one-click deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fosisdie%2Fnode-seo-for-fun)
+
+## Quick Example
+
+```
+$ node -e "
+const fs = require('fs');
+const { SEOValidator } = require('./lib/seo/seo_validator');
+const { AppUtil } = require('./lib/app_util');
+const { RuleInputEnum, RuleOutputEnum } = require('./lib/models/app_enum');
+
+let readStream = fs.createReadStream('test/input/https___google_com_tw');
+let validator = new SEOValidator()
+  .includeRules([1, 2, 3, 4, 5])
+  .setReader(AppUtil.createReader({ kind: RuleInputEnum.stream, stream: readStream }))
+  .setWriter(AppUtil.createWriter({ kind: RuleOutputEnum.console }));
+
+validator.validate().then(result => console.log(result.data));
+"
+```
+
+**Output:**
+
+```
+This HTML without <a rel> tag
+This HTML without <meta name="description"> tag
+This HTML without <meta name="keywords"> tag
+```
+
+## Built-in Rules
+
+| Rule | Checks | Severity |
+|------|--------|----------|
+| **Rule 1** | `<img>` tags must have `alt` attribute | Accessibility + SEO |
+| **Rule 2** | `<a>` tags must have `rel` attribute | SEO link signals |
+| **Rule 3** | `<head>` must contain `<title>`, `<meta name="description">`, `<meta name="keywords">` | Critical SEO |
+| **Rule 4** | No more than 15 `<strong>` tags | Content quality |
+| **Rule 5** | Only one `<H1>` tag allowed | SEO heading structure |
+| **Rule 101** | `<meta name="robots">` must exist (custom example) | Crawl control |
 
 ## Prerequisites
 
@@ -10,10 +65,29 @@ Node.js application to parse HTML DOM document, validate its SEO scores, and sho
 
 ## Installation
 
-After cloning, install all dependencies:
 ```sh
+git clone https://github.com/osisdie/node-seo-for-fun.git
+cd node-seo-for-fun
 npm install
 ```
+
+### Run Locally (Web UI)
+
+```sh
+npm start          # http://localhost:3000
+# or with hot-reload:
+npm run dev
+```
+
+Open `http://localhost:3000` to use the web-based SEO validator.
+
+### Deploy to Vercel
+
+```sh
+npx vercel
+```
+
+Or click the **Deploy with Vercel** button above for one-click deployment.
 
 ## Config Your Rules
 
@@ -155,37 +229,46 @@ Run all tests:
 npm test
 ```
 
-Test static AppUtil class usage. Most default SEO rules are predefined in config file (**default**: `conf/config.json`).
+**Sample output** (57 tests):
+```
+  AppUtil() requires(/lib/app_util.js)
+    config
+      ✔ path conf/config.json should exist
+    Function getCfgVal()
+      version
+        ✔ app:version should be 0.1.0
 
-- `setCfgVal()`: set a key-value property to config file
-- `getCfgVal()`: load a key-value property from config file
+  SEOValidator() requires(/lib/seo/seo_validator.js)
+    Function validate()
+      pass, input:file, output:file
+        ✔ rule1 should have 0 warning(s)
+        ✔ rule2 should have 0 warning(s)
+        ...
+      NOT pass, input:stream, output:console
+        ✔ https://google.com.tw returns 3 warning(s)
+
+  SingleRuleParser() requires(/lib/seo/seo_validator.js)
+    Function checkConfigSyntax()
+      ✔ correctly syntax (×11)
+    Function analysis()
+      ✔ should return isSuccess with/without warnings (×14)
+
+  57 passing (2s)
+```
+
+### Test individual modules
 
 ```sh
+# AppUtil config tests
 npm test ./test/AppUtil_test.js
-```
 
-Reader and writer classes usage:
-
-- Super classes: `ReaderBase`, `WriterBase`
-- Derived from `ReaderBase`: `FileReader`, `StreamReader`
-- Derived from `WriterBase`: `FileWriter`, `StreamWriter`, `ConsoleWriter`
-
-```sh
+# Reader/Writer I/O tests
 npm test ./test/app_fs_test.js
-```
 
-To unit test each rule's settings and syntax. We create a `SingleRuleParser` class, then call `checkConfigSyntax()`. Returns `true` if the syntax is valid.
-```sh
+# Single rule syntax validation
 npm test ./test/SingleRuleParser_test.js
-```
 
-The high-level SEO validator class: `SEOValidator`. Test portfolio includes:
-
-- Rules 1, 2, 3, 4, 5, 101 — you can `includeRules()` or `excludeRules()` on demand
-- Input/output channels with necessary properties (such as path or data)
-- HTML examples under `test/input/` folder
-
-```sh
+# Full SEO validator integration tests
 npm test ./test/SEOValidator_test.js
 ```
 
@@ -210,6 +293,24 @@ validator.validate()
     //  'This HTML without <meta name="description"> tag',
     //  'This HTML without <meta name="keywords"> tag']
   })
+```
+
+## Architecture
+
+```
+node-seo-for-fun/
+├── conf/config.json          # SEO rules & patterns configuration
+├── lib/
+│   ├── app_util.js           # Config loader & utility factory
+│   ├── core/app_fs.js        # ReaderBase / WriterBase (File, Stream, Console)
+│   ├── models/app_enum.js    # RuleInputEnum, RuleOutputEnum
+│   └── seo/
+│       ├── seo_validator.js  # SEOValidator (high-level orchestrator)
+│       └── seo_rule.js       # SingleRuleParser / SingleRuleParserBase
+├── test/
+│   ├── input/                # Test HTML files (pass / not_pass per rule)
+│   └── *.js                  # Mocha test suites
+└── .github/workflows/ci.yml  # CI: Node 20 + 22
 ```
 
 ## Create Your Own Custom Rule
@@ -242,8 +343,12 @@ You can easily create a new rule:
 }
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on adding new rules and submitting PRs.
+
 ## License
 
-MIT
+[MIT](LICENSE)
 
 *Enjoy this **node-seo-for-fun** project!*

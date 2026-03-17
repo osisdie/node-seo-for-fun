@@ -8,6 +8,8 @@ export default [
       "uploads/",
       "test/input/",
       "test/output/",
+      "public/",
+      "public/",
     ],
   },
   js.configs.recommended,
